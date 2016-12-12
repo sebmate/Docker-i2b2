@@ -1,0 +1,40 @@
+# This installs and configures i2b2 1.7 in Docker.
+# Made by Sebastian Mate (sebastian.mate@fau.de) as part of the Dockerbank TMF project in June 2016
+
+# Please note that this project may be outdated in terms of the i2b2 version. It can easily be upgrade to the latest version with the i2b2 Wizard from: https://github.com/sebmate/i2b2Wizard
+
+
+# Install and run a Oracle-XE container, e.g.:
+
+docker pull wnameless/oracle-xe-11g
+
+docker run -d --name oracle -p 49160:22 -p 49161:1521 wnameless/oracle-xe-11g
+
+# Build the i2b2 image based on the Dockerfile:
+
+docker build -t cyberseb/i2b2:1.7.07 .
+
+# Run the built i2b2 image as container:
+
+docker run --name i2b2-1.7.07 -it -p 80:80 --link oracle:oracle cyberseb/i2b2:1.7.07 /bin/bash 
+
+# In the running i2b2 container, start the i2b2-Wizard in automatic mode (for some reason, this cannot be done
+# from the Dockerfile, because the dialog tool does not work):
+
+./wizard.sh --docker oracle
+
+# --------------------------------------
+
+# To stop and remove all previously created containers, run these commands:
+
+docker stop oracle
+docker rm oracle
+
+docker stop i2b2-1.7.07
+docker rm i2b2-1.7.07
+
+# To stop and remove ALL containers and images, run these commands (use with caution):
+
+docker rm $(docker ps -a -q)
+docker rmi $(docker images -q)
+
